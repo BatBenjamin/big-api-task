@@ -1,0 +1,290 @@
+openapi: 3.0.1
+info:
+  title: Todo-Listen-Verwaltung
+  description: ""
+  contact:
+    email: b-bat@gmx.de.de
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.1.0
+servers:
+- url: http://127.0.0.1:5000/
+tags:
+- name: Listenverwaltung
+paths:
+  /todo-list/{list_id}/entries:
+    get:
+      tags:
+      - Listenverwaltung
+      summary: Liefert alle Einträge einer Todo-Liste zurück
+      operationId: getList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List item returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoEntry'
+        404:
+          description: Invalid list id
+          content: {}
+        405:
+          description: Wrong method
+          content: {}  
+        500:
+          description: Lists could not be listed
+          content: {}  
+  /todo-list:
+    post:
+      tags:
+      - Listenverwaltung
+      summary: Füge eine neue Todo-Liste hinzu
+      operationId: addList
+      requestBody:
+        description: list object
+        content:
+          application/json:
+            type: array
+            schema:
+              $ref: '#/components/schemas/TodoList'
+        required: true
+      responses:
+        200:
+          description: List added
+          content:
+            application/json:
+              type: array
+              schema:
+                $ref: '#/components/schemas/TodoList'
+        400:
+          description: Erronous Request
+          content:
+            application/json:
+              type: array
+              schema:
+                $ref: '#/components/schemas/TodoList'
+        404:
+          description: Invalid list id
+          content: {}
+        405:
+          description: Wrong method
+          content: {}       
+        500:
+          description: List could not be added
+          content: {}
+      x-codegen-request-body-name: body
+  /todo-list/{list_id}: #WIP
+    get:
+      tags:
+      - Listenverwaltung
+      summary: Liefert eine Liste zurück
+      operationId: getList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List item returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoEntry'
+        404:
+          description: Invalid list id
+          content: {}
+        405:
+          description: Wrong method
+          content: {}  
+        500:
+          description: Server error
+          content: {}  
+    delete:
+      tags:
+      - Listenverwaltung
+      summary: Löscht eine komplette Todo-Liste mit allen Einträgen
+      operationId: deleteList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List was deleted
+          content: {}
+        404:
+          description: Invalid list id
+          content: {}
+        405:
+          description: Wrong method
+          content: {}  
+        500:
+          description: Server error
+          content: {}  
+  /todo-list/{list_id}/entry: #WIP
+    post:
+      tags:
+      - Listenverwaltung
+      summary: Fügt einen Eintrag zu einer bestehenden Todo-Liste hinzu
+      operationId: getList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List item returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoEntry'
+        404:
+          description: Invalid list id
+          content: {}
+        405:
+          description: Wrong method
+          content: {}  
+        500:
+          description: Server error
+          content: {}  
+  /todo-list/{list_id}/entry/{entry_id}:
+    put:
+      tags:
+      - Listenverwaltung
+      summary: Aktualisiert einen bestehenden Eintrag
+      operationId: getList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List item returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoEntry'
+        404:
+          description: Invalid list id
+          content: {}
+        405:
+          description: Wrong method
+          content: {}  
+        500:
+          description: Server error
+          content: {}
+    delete:
+      tags:
+      - Listenverwaltung
+      summary: Löscht einen einzelnen Eintrag einer Todo-Liste
+      operationId: getList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List item returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoEntry'
+        404:
+          description: Invalid list id
+          content: {}
+        405:
+          description: Wrong method
+          content: {}  
+        500:
+          description: Server error
+          content: {}  
+  /todo-lists: #WIP
+    get:
+      tags:
+      - Listenverwaltung
+      summary: Liefert alle Todo-Listen zurück
+      operationId: getList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List item returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoEntry'
+        404:
+          description: Invalid list id
+          content: {}
+        405:
+          description: Wrong method
+          content: {}  
+        500:
+          description: Server error
+          content: {}
+components:
+  schemas:
+    TodoList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    TodoEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        list_id:
+          type: string
+          format: uuid
