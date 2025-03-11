@@ -18,7 +18,7 @@ paths:
       tags:
       - Listenverwaltung
       summary: Liefert alle Einträge einer Todo-Liste zurück
-      operationId: getList
+      operationId: getEntries
       parameters:
       - name: list_id
         in: path
@@ -54,7 +54,6 @@ paths:
         description: list object
         content:
           application/json:
-            type: array
             schema:
               $ref: '#/components/schemas/TodoList'
         required: true
@@ -63,14 +62,12 @@ paths:
           description: List added
           content:
             application/json:
-              type: array
               schema:
                 $ref: '#/components/schemas/TodoList'
         400:
           description: Erronous Request
           content:
             application/json:
-              type: array
               schema:
                 $ref: '#/components/schemas/TodoList'
         404:
@@ -144,7 +141,7 @@ paths:
       tags:
       - Listenverwaltung
       summary: Fügt einen Eintrag zu einer bestehenden Todo-Liste hinzu
-      operationId: getList
+      operationId: addEntry
       parameters:
       - name: list_id
         in: path
@@ -175,11 +172,18 @@ paths:
       tags:
       - Listenverwaltung
       summary: Aktualisiert einen bestehenden Eintrag
-      operationId: getList
+      operationId: updateEntry
       parameters:
       - name: list_id
         in: path
         description: list id
+        required: true
+        schema:
+          type: string
+          
+      - name: entry_id
+        in: path
+        description: entry id
         required: true
         schema:
           type: string
@@ -205,11 +209,17 @@ paths:
       tags:
       - Listenverwaltung
       summary: Löscht einen einzelnen Eintrag einer Todo-Liste
-      operationId: getList
+      operationId: deleteEntry
       parameters:
       - name: list_id
         in: path
         description: list id
+        required: true
+        schema:
+          type: string
+      - name: entry_id
+        in: path
+        description: entry id
         required: true
         schema:
           type: string
@@ -236,14 +246,7 @@ paths:
       tags:
       - Listenverwaltung
       summary: Liefert alle Todo-Listen zurück
-      operationId: getList
-      parameters:
-      - name: list_id
-        in: path
-        description: list id
-        required: true
-        schema:
-          type: string
+      operationId: getLists
       responses:
         200:
           description: List item returned
