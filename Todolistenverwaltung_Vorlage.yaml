@@ -28,13 +28,13 @@ paths:
           type: string
       responses:
         200:
-          description: List item returned
+          description: List entries returned
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TodoEntry'
+                  $ref: '#/components/schemas/TodoEntryResponse'
         404:
           description: Invalid list id
           content: {}
@@ -42,7 +42,7 @@ paths:
           description: Wrong method
           content: {}  
         500:
-          description: Lists could not be listed
+          description: Entries could not be listed
           content: {}  
   /todo-list:
     post:
@@ -63,15 +63,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TodoList'
+                $ref: '#/components/schemas/TodoListResponse'
         400:
           description: Erronous Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TodoList'
+          content: {}
         404:
-          description: Invalid list id
+          description: Not found
           content: {}
         405:
           description: Wrong method
@@ -80,7 +77,7 @@ paths:
           description: List could not be added
           content: {}
       x-codegen-request-body-name: body
-  /todo-list/{list_id}: #WIP
+  /todo-list/{list_id}:
     get:
       tags:
       - Listenverwaltung
@@ -101,7 +98,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TodoEntry'
+                  $ref: '#/components/schemas/TodoListResponse'
         404:
           description: Invalid list id
           content: {}
@@ -126,7 +123,14 @@ paths:
       responses:
         200:
           description: List was deleted
-          content: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: success
         404:
           description: Invalid list id
           content: {}
@@ -136,12 +140,20 @@ paths:
         500:
           description: Server error
           content: {}  
-  /todo-list/{list_id}/entry: #WIP
+  /todo-list/{list_id}/entry:
     post:
       tags:
       - Listenverwaltung
       summary: Fügt einen Eintrag zu einer bestehenden Todo-Liste hinzu
       operationId: addEntry
+      requestBody:
+        description: list object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoEntry'
+        required: true
+      
       parameters:
       - name: list_id
         in: path
@@ -151,13 +163,13 @@ paths:
           type: string
       responses:
         200:
-          description: List item returned
+          description: Entry returned
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TodoEntry'
+                  $ref: '#/components/schemas/TodoEntryResponse'
         404:
           description: Invalid list id
           content: {}
@@ -173,6 +185,14 @@ paths:
       - Listenverwaltung
       summary: Aktualisiert einen bestehenden Eintrag
       operationId: updateEntry
+      requestBody:
+        description: list object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoEntry'
+        required: true
+      
       parameters:
       - name: list_id
         in: path
@@ -189,15 +209,15 @@ paths:
           type: string
       responses:
         200:
-          description: List item returned
+          description: Entry changed
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TodoEntry'
+                  $ref: '#/components/schemas/TodoEntryResponse'
         404:
-          description: Invalid list id
+          description: Entry not found
           content: {}
         405:
           description: Wrong method
@@ -225,15 +245,17 @@ paths:
           type: string
       responses:
         200:
-          description: List item returned
+          description: Entry deleted
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TodoEntry'
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: success
         404:
-          description: Invalid list id
+          description: Entry not found
           content: {}
         405:
           description: Wrong method
@@ -241,7 +263,7 @@ paths:
         500:
           description: Server error
           content: {}  
-  /todo-lists: #WIP
+  /todo-lists:
     get:
       tags:
       - Listenverwaltung
@@ -249,15 +271,15 @@ paths:
       operationId: getLists
       responses:
         200:
-          description: List item returned
+          description: List items returned
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TodoEntry'
+                  $ref: '#/components/schemas/TodoListResponse'
         404:
-          description: Invalid list id
+          description: No lists found
           content: {}
         405:
           description: Wrong method
@@ -270,12 +292,24 @@ components:
     TodoList:
       type: object
       properties:
+        name:
+          type: string
+    TodoEntry:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    TodoListResponse:
+      type: object
+      properties:
         id:
           type: string
           format: uuid
         name:
           type: string
-    TodoEntry:
+    TodoEntryResponse:
       type: object
       properties:
         id:
@@ -285,9 +319,3 @@ components:
           type: string
         description:
           type: string
-        user_id:
-          type: string
-          format: uuid
-        list_id:
-          type: string
-          format: uuid
