@@ -2,7 +2,7 @@ import uuid
 from flask import Flask, request, jsonify, abort
 app = Flask(__name__)
 
-# erstelle einzigartige IDs für listen und einträge
+# erstelle einzigartige IDs für listen und einträge zu Test- und Demonstrationszwecken
 todo_list_1_id = '1318d3d1-d979-47e1-a225-dab1751dbe75'
 todo_list_2_id = '3062dc25-6b80-4315-bb1d-a7c86b014c65'
 todo_list_3_id = '44b02e00-03bc-451d-8d01-0c67ea866fee'
@@ -33,35 +33,33 @@ def apply_cors_header(response):
 # Endpunkt zum getten und löschen bestehender Todo-Listen
 @app.route('/todo-list/<list_id>', methods=['GET', 'DELETE'])
 def handle_list(list_id):
-    # find todo list depending on given list id
     list_item = None
     for l in todo_lists:
         if l['id'] == list_id:
             list_item = l
             break
-    # if the given list id is invalid, return status code 404
+    # Fehlermeldung wenn liste nicht gegeben
     if not list_item:
         abort(404)
     if request.method == 'GET':
-        # find all todo entries for the todo list with the given id
+        # Finde die spezifische Liste
         print('Returning todo list...')
         return jsonify(list_item)
     elif request.method == 'DELETE':
-        # delete list with given id
+        # Lösche Liste mit der ID, inklusive aller Einträge
         print('Deleting todo list...')
         todo_lists.remove(list_item)
         for t in todos:
             if t['list'] == list_id:
                 todos.remove(t)
         return jsonify({'msg': 'success'}), 200
+    
 # Endpunkt zum hinzufügen neuer Listen
-
 @app.route('/todo-list', methods=['POST'])
 def add_new_list():
-    # make JSON from POST data (even if content type is not set correctly)
+    # Erstelle eine neue Liste
     new_list = request.get_json(force=True)
     print('Got new list to be added: {}'.format(new_list))
-    # create id for new list, save it and return the list with id
     new_list['id'] = str(uuid.uuid4())
     todo_lists.append(new_list)
     return jsonify(new_list), 200
@@ -75,22 +73,21 @@ def add_new_entry(list_id):
             break
     if list_item == None:
         abort(404)
-    # make JSON from POST data (even if content type is not set correctly)
+    # Erstelle neuen Eintrag der Liste
     new_entry = request.get_json(force=True)
     print('Got new entry to be added: {}'.format(new_entry))
-    # create id for new entry, save it and return the entry with id
     new_entry['id'] = str(uuid.uuid4())
     new_entry['list'] = list_id
     todos.append(new_entry)
     return jsonify(new_entry), 200
 
 
-# Endpunkt für das getten von allen Listen, funktioniert
+# Endpunkt für das getten von allen Listen
 @app.route('/todo-lists', methods=['GET'])
 def get_all_lists():
     return jsonify(todo_lists)
 
-# end point for getting all the entries of a given list
+# Endpunkt zum Erhalten aller Einträge einer Liste
 @app.route('/todo-list/<list_id>/entries', methods=['GET'])
 def get_all_entries(list_id):
     list_entries = []
@@ -106,20 +103,18 @@ def get_all_entries(list_id):
 
 @app.route('/todo-list/<list_id>/entry/<entry_id>', methods=['PUT', 'DELETE'])
 def handle_entry(list_id, entry_id):
-    # update or delete a todo-list entry
+    # update oder lösche Todo-Listeneintrag
     entry_item = None
     for t in todos:
         if t['id'] == entry_id and t['list'] == list_id:
-
             entry_item = t
-            #print(entry_item)
             break
-    # if the given entry is invalid, return status code 404
+    # wenn kein Eintrag, gieb Fehler 404 zurück.
     if not entry_item:
         print(entry_item)
         abort(404)
     
-        # update entry of given id
+        # update Eintrag unter den gegebenen IDs
         
     elif request.method == "PUT":
         updated_entry = request.get_json(force=True)
@@ -135,7 +130,7 @@ def handle_entry(list_id, entry_id):
 
 
     elif request.method == 'DELETE':
-        # delete entry of given list with given id
+        # Lösche den Eintrag in der Liste basierend auf Listen- und Eintrags-ID
         print('Deleting entry...')
         print(entry_item)
         todos.remove(entry_item)
@@ -143,6 +138,6 @@ def handle_entry(list_id, entry_id):
 
 
 if __name__ == '__main__':
-    # start Flask server
+    # starte Flask server
     app.debug = True
     app.run(host='127.0.0.1', port=5000)
