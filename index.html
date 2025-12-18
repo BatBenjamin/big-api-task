@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo / Notes App</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; }
+    #lists, #entries { padding: 1rem; width: 50%; }
+    li { cursor: pointer; margin-bottom: 0.5rem; }
+    button { margin-left: 0.5rem; }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT: TODO LISTS -->
+  <div id="lists">
+    <h2>Lists</h2>
+    <ul id="listContainer"></ul>
+
+    <h3>Add List</h3>
+    <input id="newListName" placeholder="List name">
+    <button onclick="addList()">Add</button>
+  </div>
+
+  <!-- RIGHT: ENTRIES -->
+  <div id="entries">
+    <h2 id="entryTitle">Entries</h2>
+    <ul id="entryContainer"></ul>
+
+    <h3>Add Entry</h3>
+    <input id="entryName" placeholder="Title">
+    <input id="entryDesc" placeholder="Description">
+    <button onclick="addEntry()">Add</button>
+  </div>
+
+<script>
+const API = "http://localhost:5000";
+
+let currentListId = null;
+
+/* ---------------- LISTS ---------------- */
+
+async function loadLists() {
+  const res = await fetch(`${API}/todo-lists`);
+  const lists = await res.json();
+
+  const ul = document.getElementById("listContainer");
+  ul.innerHTML = "";
+
+  lists.forEach(l => {
+    const li = document.createElement("li");
+    li.textContent = l.name;
+    li.onclick = () => selectList(l.id, l.name);
+
+    const del = document.createElement("button");
+    del.textContent = "🗑";
+    del.onclick = async (e) => {
+      e.stopPropagation();
+      await fetch(`${API}/todo-list/${l.id}`, { method: "DELETE" });
+      loadLists();
+      document.getElementById("entryContainer").innerHTML = "";
+    };
+
+    li.appendChild(del);
+    ul.appendChild(li);
+  });
+}
+
+async function addList() {
+  const name = document.getElementById("newListName").value;
+  if (!name) return;
+
+  await fetch(`${API}/todo-list`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name })
+  });
+
+  document.getElementById("newListName").value = "";
+  loadLists();
+}
+
+/* ---------------- ENTRIES ---------------- */
+
+async function selectList(listId, listName) {
+  currentListId = listId;
+  document.getElementById("entryTitle").textContent = `Entries: ${listName}`;
+  loadEntries();
+}
+
+async function loadEntries() {
+  if (!currentListId) return;
+
+  const res = await fetch(`${API}/todo-list/${currentListId}/entries`);
+  const entries = await res.json();
+
+  const ul = document.getElementById("entryContainer");
+  ul.innerHTML = "";
+
+  entries.forEach(e => {
+    const li = document.createElement("li");
+    li.textContent = `${e.name} – ${e.description}`;
+
+    const del = document.createElement("button");
+    del.textContent = "🗑";
+    del.onclick = async () => {
+      await fetch(
+        `${API}/todo-list/${currentListId}/entry/${e.id}`,
+        { method: "DELETE" }
+      );
+      loadEntries();
+    };
+
+    li.appendChild(del);
+    ul.appendChild(li);
+  });
+}
+
+async function addEntry() {
+  if (!currentListId) return alert("Select a list first!");
+
+  const name = document.getElementById("entryName").value;
+  const description = document.getElementById("entryDesc").value;
+
+  await fetch(`${API}/todo-list/${currentListId}/entry`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, description })
+  });
+
+  document.getElementById("entryName").value = "";
+  document.getElementById("entryDesc").value = "";
+  loadEntries();
+}
+
+/* INIT */
+loadLists();
+</script>
+</body>
+</html>
