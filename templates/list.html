@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ todo_list.name }}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>{{ todo_list.name }}</h1>
+
+    <ul id="entries"></ul>
+
+    <input id="entry-name" placeholder="New entry">
+    <button onclick="addEntry()">Add</button>
+
+    <br><br>
+    <a href="/">← Back to all lists</a>
+
+    <script>
+        const listId = "{{ todo_list.id }}";
+    </script>
+    <script src="/static/app.js"></script>
+</body>
+</html>

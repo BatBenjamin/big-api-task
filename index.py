@@ -32,7 +32,15 @@ def apply_cors_header(response):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", todo_lists=todo_lists)
+
+@app.route("/todo-list/<list_id>/page")
+def list_page(list_id):
+    list_item = next((l for l in todo_lists if l["id"] == list_id), None)
+    if not list_item:
+        abort(404)
+
+    return render_template("list.html", todo_list=list_item)
 
 # Endpunkt zum getten und löschen bestehender Todo-Listen
 @app.route('/todo-list/<list_id>', methods=['GET', 'DELETE'])
