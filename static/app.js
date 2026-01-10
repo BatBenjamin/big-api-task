@@ -14,6 +14,24 @@ async function createList() {
     window.location.reload();
 }
 
+async function deleteList() {
+    const confirmed = confirm(
+        "Are you sure you want to delete this list and all its entries?"
+    );
+
+    if (!confirmed) return;
+
+    const res = await fetch(`/todo-list/${listId}`, {
+        method: "DELETE"
+    });
+
+    if (res.ok) {
+        window.location.href = "/";
+    } else {
+        alert("Failed to delete list");
+    }
+}
+
 async function loadEntries(listId) {
     const res = await fetch(`/todo-list/${listId}/entries`);
     const entries = await res.json();
