@@ -1,5 +1,5 @@
 import uuid
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort, render_template
 app = Flask(__name__)
 
 # erstelle einzigartige IDs für listen und einträge zu Test- und Demonstrationszwecken
@@ -29,6 +29,10 @@ def apply_cors_header(response):
     response.headers['Access-Control-Allow-Methods'] = 'GET,POST,DELETE,PUT'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
     return response
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 # Endpunkt zum getten und löschen bestehender Todo-Listen
 @app.route('/todo-list/<list_id>', methods=['GET', 'DELETE'])
