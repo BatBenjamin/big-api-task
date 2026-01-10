@@ -1,5 +1,8 @@
 async function createList() {
-    const name = document.getElementById("list-name").value;
+    const input = document.getElementById("list-name");
+    const name = input.value.trim();
+
+    if (!name) return;
 
     await fetch("/todo-list", {
         method: "POST",
@@ -7,7 +10,8 @@ async function createList() {
         body: JSON.stringify({ name })
     });
 
-    location.reload();
+    input.value = "";
+    window.location.reload();
 }
 
 async function loadEntries(listId) {
@@ -47,6 +51,8 @@ async function deleteEntry(listId, entryId) {
     loadEntries(listId);
 }
 
+document.addEventListener("DOMContentLoaded", () => {
 if (typeof listId !== "undefined") {
     loadEntries(listId);
 }
+});
